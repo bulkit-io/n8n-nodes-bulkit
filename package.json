@@ -1,17 +1,55 @@
 {
   "name": "n8n-nodes-bulkit",
-  "version": "0.0.1",
-  "description": "Bulkit nodes for n8n: schedule and publish social media posts. Placeholder, first release coming soon.",
+  "version": "0.0.2",
+  "description": "Bulkit for n8n: schedule and publish social media posts to X, LinkedIn, Instagram, Facebook, Threads, TikTok, YouTube, Pinterest, Reddit and Bluesky from your n8n workflows. Node coming soon; works today via the HTTP Request node.",
   "license": "MIT",
-  "author": "Bulkit <support@bulkit.io>",
-  "homepage": "https://bulkit.io",
-  "bugs": "https://github.com/bulkit-io/n8n-nodes-bulkit/issues",
+  "author": {
+    "name": "Bulkit",
+    "email": "support@bulkit.io",
+    "url": "https://bulkit.io"
+  },
+  "homepage": "https://bulkit.io?utm_source=npm&utm_medium=package&utm_campaign=n8n_node",
+  "bugs": {
+    "url": "https://github.com/bulkit-io/n8n-nodes-bulkit/issues",
+    "email": "support@bulkit.io"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/bulkit-io/n8n-nodes-bulkit.git"
   },
-  "keywords": ["bulkit", "n8n", "social-media", "scheduling"],
-  "files": ["README.md", "LICENSE"],
+  "keywords": [
+    "bulkit",
+    "n8n",
+    "n8n-node",
+    "n8n-nodes",
+    "n8n-integration",
+    "n8n-workflow",
+    "automation",
+    "workflow-automation",
+    "social-media",
+    "social-media-automation",
+    "social-media-scheduler",
+    "social-media-api",
+    "scheduling",
+    "post-scheduler",
+    "auto-post",
+    "cross-post",
+    "twitter",
+    "x",
+    "linkedin",
+    "instagram",
+    "facebook",
+    "threads",
+    "tiktok",
+    "youtube",
+    "pinterest",
+    "reddit",
+    "bluesky"
+  ],
+  "files": [
+    "README.md",
+    "LICENSE"
+  ],
   "publishConfig": {
     "access": "public"
   }
