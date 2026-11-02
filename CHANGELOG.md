@@ -1,5 +1,11 @@
 # n8n-nodes-bulkit
 
+## 0.1.2
+
+### Patch Changes
+
+- 8022688: Use contact@bulkit.io as the package contact address.
+
 ## 0.1.1
 
 ### Patch Changes
