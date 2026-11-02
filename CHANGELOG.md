@@ -1,5 +1,11 @@
 # n8n-nodes-bulkit
 
+## 0.1.1
+
+### Patch Changes
+
+- 14eec32: Publish with an npm provenance attestation, which n8n requires for verified community nodes. No code changes.
+
 ## 0.1.0
 
 ### Minor Changes
