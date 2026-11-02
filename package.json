@@ -52,5 +52,14 @@
   ],
   "publishConfig": {
     "access": "public"
+  },
+  "packageManager": "pnpm@11.8.0",
+  "scripts": {
+    "changeset": "changeset",
+    "version": "changeset version",
+    "release": "changeset publish"
+  },
+  "devDependencies": {
+    "@changesets/cli": "3.0.3"
   }
 }
