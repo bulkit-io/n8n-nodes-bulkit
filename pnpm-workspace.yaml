@@ -1,0 +1,7 @@
+# Install scripts of dev-only transitive dependencies (pulled in by @n8n/node-cli for `n8n-node dev`).
+# None are needed to build, lint or publish this package, so they stay off.
+allowBuilds:
+  cpu-features: false
+  eslint-plugin-n8n-nodes-base: false
+  isolated-vm: false
+  ssh2: false

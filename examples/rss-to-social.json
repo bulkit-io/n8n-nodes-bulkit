@@ -1,0 +1,46 @@
+{
+  "name": "Blog RSS to social media with Bulkit",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": { "item": [{ "mode": "everyHour" }] },
+        "feedUrl": "https://example.com/blog/rss.xml"
+      },
+      "name": "New blog post",
+      "type": "n8n-nodes-base.rssFeedReadTrigger",
+      "typeVersion": 1,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "resource": "post",
+        "operation": "create",
+        "inputMode": "fields",
+        "intent": "now",
+        "channels": {
+          "channel": [
+            {
+              "channelId": "REPLACE_WITH_YOUR_X_CHANNEL_ID",
+              "content": "=New on the blog: {{ $json.title }}\n\n{{ $json.link }}"
+            },
+            {
+              "channelId": "REPLACE_WITH_YOUR_LINKEDIN_CHANNEL_ID",
+              "content": "=We just published \"{{ $json.title }}\".\n\n{{ $json.contentSnippet }}\n\nRead it here: {{ $json.link }}"
+            }
+          ]
+        },
+        "additionalFields": {},
+        "idempotencyKey": "={{ $json.guid || $json.link }}"
+      },
+      "name": "Post to X and LinkedIn",
+      "type": "n8n-nodes-bulkit.bulkit",
+      "typeVersion": 1,
+      "position": [260, 0]
+    }
+  ],
+  "connections": {
+    "New blog post": {
+      "main": [[{ "node": "Post to X and LinkedIn", "type": "main", "index": 0 }]]
+    }
+  }
+}

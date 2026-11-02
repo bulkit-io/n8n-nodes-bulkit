@@ -1,0 +1,33 @@
+{
+  "name": "Get an email when a Bulkit post fails",
+  "nodes": [
+    {
+      "parameters": {
+        "events": ["post.failed", "post.partially_failed", "channel.needs_reconnect"]
+      },
+      "name": "Bulkit Trigger",
+      "type": "n8n-nodes-bulkit.bulkitTrigger",
+      "typeVersion": 1,
+      "position": [0, 0],
+      "webhookId": "bulkit-failed-posts"
+    },
+    {
+      "parameters": {
+        "fromEmail": "alerts@example.com",
+        "toEmail": "team@example.com",
+        "subject": "=Bulkit: {{ $json.type }}",
+        "emailFormat": "text",
+        "text": "={{ $json.type === 'channel.needs_reconnect' ? 'Reconnect ' + $json.data.channel.name + ': ' + $json.data.reason : 'Post ' + $json.data.post.id + ' on ' + $json.data.platform + ' failed: ' + $json.data.error }}"
+      },
+      "name": "Email the team",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [260, 0]
+    }
+  ],
+  "connections": {
+    "Bulkit Trigger": {
+      "main": [[{ "node": "Email the team", "type": "main", "index": 0 }]]
+    }
+  }
+}
