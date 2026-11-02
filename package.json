@@ -10,9 +10,26 @@
     "type": "git",
     "url": "git+https://github.com/bulkit-io/n8n-nodes-bulkit.git"
   },
-  "keywords": ["bulkit", "n8n", "social-media", "scheduling"],
-  "files": ["README.md", "LICENSE"],
+  "keywords": [
+    "bulkit",
+    "n8n",
+    "social-media",
+    "scheduling"
+  ],
+  "files": [
+    "README.md",
+    "LICENSE"
+  ],
   "publishConfig": {
     "access": "public"
+  },
+  "packageManager": "pnpm@11.8.0",
+  "scripts": {
+    "changeset": "changeset",
+    "version": "changeset version",
+    "release": "changeset publish"
+  },
+  "devDependencies": {
+    "@changesets/cli": "3.0.3"
   }
 }
