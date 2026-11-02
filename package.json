@@ -5,13 +5,13 @@
   "license": "MIT",
   "author": {
     "name": "Bulkit",
-    "email": "support@bulkit.io",
+    "email": "contact@bulkit.io",
     "url": "https://bulkit.io"
   },
   "homepage": "https://bulkit.io?utm_source=npm&utm_medium=package&utm_campaign=n8n_node",
   "bugs": {
     "url": "https://github.com/bulkit-io/n8n-nodes-bulkit/issues",
-    "email": "support@bulkit.io"
+    "email": "contact@bulkit.io"
   },
   "repository": {
     "type": "git",

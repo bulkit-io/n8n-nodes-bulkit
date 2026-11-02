@@ -132,7 +132,7 @@ Tested with n8n 2.45. Has no runtime dependencies.
 
 - [Bulkit documentation](https://docs.bulkit.io/docs?utm_source=npm&utm_medium=readme&utm_campaign=n8n_node)
 - [n8n community nodes documentation](https://docs.n8n.io/integrations/#community-nodes)
-- Questions or a workflow you want supported: [support@bulkit.io](mailto:support@bulkit.io),
+- Questions or a workflow you want supported: [contact@bulkit.io](mailto:contact@bulkit.io),
   [X](https://x.com/bulkitio), or [open an issue](https://github.com/bulkit-io/n8n-nodes-bulkit/issues)
 
 **New to Bulkit? [Start your 14-day free trial →](https://app.bulkit.io/register?utm_source=npm&utm_medium=readme&utm_campaign=n8n_node)**
