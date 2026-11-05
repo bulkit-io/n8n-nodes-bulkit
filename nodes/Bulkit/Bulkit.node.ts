@@ -179,7 +179,8 @@ async function executePost(
 ): Promise<IDataObject | IDataObject[]> {
 	if (operation === 'create') {
 		const headers: IDataObject = {};
-		const idempotencyKey = (this.getNodeParameter('idempotencyKey', i, '') as string).trim();
+		const options = this.getNodeParameter('options', i, {}) as IDataObject;
+		const idempotencyKey = ((options.idempotencyKey as string | undefined) ?? '').trim();
 		if (idempotencyKey) headers['Idempotency-Key'] = idempotencyKey;
 
 		const inputMode = this.getNodeParameter('inputMode', i) as string;

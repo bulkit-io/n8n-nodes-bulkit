@@ -30,7 +30,9 @@
           ]
         },
         "additionalFields": {},
-        "idempotencyKey": "={{ $json.guid || $json.link }}"
+        "options": {
+          "idempotencyKey": "={{ $json.guid || $json.link }}"
+        }
       },
       "name": "Post to X and LinkedIn",
       "type": "n8n-nodes-bulkit.bulkit",

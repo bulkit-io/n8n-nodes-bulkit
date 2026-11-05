@@ -243,13 +243,22 @@ export const postFields: INodeProperties[] = [
 		],
 	},
 	{
-		displayName: 'Idempotency Key',
-		name: 'idempotencyKey',
-		type: 'string',
-		default: '',
-		description:
-			'Optional. Sending the same key again returns the original post instead of creating a duplicate, which makes retries safe.',
+		displayName: 'Options',
+		name: 'options',
+		type: 'collection',
+		placeholder: 'Add Option',
+		default: {},
 		displayOptions: showFor(['create']),
+		options: [
+			{
+				displayName: 'Idempotency Key',
+				name: 'idempotencyKey',
+				type: 'string',
+				default: '',
+				description:
+					'Sending the same key again returns the original post instead of creating a duplicate, which makes retries safe',
+			},
+		],
 	},
 
 	// ----------------------------------------------------------------------

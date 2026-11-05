@@ -73,7 +73,7 @@ test('post:create sends one submission with per-channel blocks, thread and sched
 			inputMode: 'fields',
 			intent: 'schedule',
 			scheduledAt: '2026-12-01T09:00:00',
-			idempotencyKey: 'run-1',
+			options: { idempotencyKey: 'run-1' },
 			channels: {
 				channel: [
 					{ channelId: 'chn_x', content: 'Hello', thread: ['Part 2', ''], mediaIds: 'med_1, med_2' },
