@@ -1,5 +1,15 @@
 # n8n-nodes-bulkit
 
+## 0.2.0
+
+### Minor Changes
+
+- c40ee2d: Move Idempotency Key on Post > Create into a new Options collection, as required by the n8n verified-node review. Workflows that set the old top-level Idempotency Key need to set it again under Options.
+
+### Patch Changes
+
+- 8c42f54: Show a clean homepage link on npm by dropping the UTM parameters from the package homepage URL.
+
 ## 0.1.2
 
 ### Patch Changes
