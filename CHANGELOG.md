@@ -1,5 +1,11 @@
 # n8n-nodes-bulkit
 
+## 0.2.1
+
+### Patch Changes
+
+- a48b415: List Vimeo among the supported networks in the package and node descriptions.
+
 ## 0.2.0
 
 ### Minor Changes
