@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-bulkit",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Bulkit for n8n: schedule and publish social media posts to X, LinkedIn, Instagram, Facebook, Threads, TikTok, YouTube, Pinterest, Reddit, Bluesky and Vimeo from your n8n workflows.",
   "license": "MIT",
   "author": {
