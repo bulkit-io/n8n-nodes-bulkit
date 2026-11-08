@@ -49,7 +49,7 @@ export class Bulkit implements INodeType {
 		version: 1,
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
 		description:
-			'Schedule and publish social media posts to X, LinkedIn, Instagram, Facebook, Threads, TikTok, YouTube, Pinterest, Reddit and Bluesky',
+			'Schedule and publish social media posts to X, LinkedIn, Instagram, Facebook, Threads, TikTok, YouTube, Pinterest, Reddit, Bluesky and Vimeo',
 		defaults: { name: 'Bulkit' },
 		usableAsTool: true,
 		inputs: [NodeConnectionTypes.Main],
