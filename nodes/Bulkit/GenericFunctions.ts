@@ -87,7 +87,13 @@ export async function bulkitApiRequest(
 	return (data === '' || data === undefined ? {} : data) as IDataObject | IDataObject[];
 }
 
-/** Follow `nextCursor` until the end, or until `limit` items have been collected. */
+/**
+ * Follow `nextCursor` until the end, or until `limit` items have been collected. Stops early when
+ * the API says `hasMore: false` or hands back a cursor it already gave, so a misbehaving server
+ * cannot make Return All loop forever. An empty page is not the end: comments are read live and a
+ * page can come back empty with more after it. A bare array (the older, unpaginated
+ * response shape) is returned as is.
+ */
 export async function bulkitApiRequestAllItems(
 	this: IExecuteFunctions | ILoadOptionsFunctions,
 	endpoint: string,
@@ -96,6 +102,7 @@ export async function bulkitApiRequestAllItems(
 	itemIndex?: number,
 ): Promise<IDataObject[]> {
 	const results: IDataObject[] = [];
+	const seen = new Set<string>();
 	let cursor: string | null | undefined;
 	do {
 		const query: IDataObject = { ...qs };
@@ -108,12 +115,44 @@ export async function bulkitApiRequestAllItems(
 			query,
 			{},
 			itemIndex,
-		)) as { data?: IDataObject[]; nextCursor?: string | null };
-		results.push(...(page.data ?? []));
+		)) as IDataObject[] | { data?: IDataObject[]; nextCursor?: string | null; hasMore?: boolean };
+		if (Array.isArray(page)) {
+			results.push(...page);
+			break;
+		}
+		const data = page.data ?? [];
+		results.push(...data);
+		if (limit !== undefined && results.length >= limit) break;
+		if (cursor) seen.add(cursor);
 		cursor = page.nextCursor;
-		if (limit !== undefined && results.length >= limit) return results.slice(0, limit);
+		if (page.hasMore === false || (cursor && seen.has(cursor))) break;
 	} while (cursor);
-	return results;
+	return limit === undefined ? results : results.slice(0, limit);
+}
+
+/**
+ * Run a Get Many operation from the node's Return All and Limit parameters. Limit must be a
+ * positive whole number; with `sendPageSize`, it also sets the page size (capped at 100).
+ */
+export async function getManyFromParameters(
+	this: IExecuteFunctions,
+	endpoint: string,
+	qs: IDataObject,
+	itemIndex: number,
+	{ sendPageSize = true }: { sendPageSize?: boolean } = {},
+): Promise<IDataObject[]> {
+	const returnAll = this.getNodeParameter('returnAll', itemIndex) as boolean;
+	let limit: number | undefined;
+	if (!returnAll) {
+		limit = Number(this.getNodeParameter('limit', itemIndex));
+		if (!Number.isInteger(limit) || limit < 1) {
+			throw new NodeOperationError(this.getNode(), 'Limit must be a whole number of at least 1', {
+				itemIndex,
+			});
+		}
+	}
+	const query: IDataObject = sendPageSize ? { limit: Math.min(limit ?? 100, 100), ...qs } : qs;
+	return await bulkitApiRequestAllItems.call(this, endpoint, query, limit, itemIndex);
 }
 
 /** Build a multipart/form-data body by hand, so no form library is needed. */
