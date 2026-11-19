@@ -157,6 +157,93 @@ test('post:getAll follows the cursor and stops at the limit', async () => {
 	assert.deepEqual(ctx.calls[1].qs, { limit: 3, status: ['failed'], cursor: 'c1' });
 });
 
+test('media:getAll follows the cursor and stops at the limit', async () => {
+	const ctx = makeContext({ resource: 'media', operation: 'getAll', returnAll: false, limit: 3 }, [
+		{ statusCode: 200, body: { data: [{ id: 'm1' }, { id: 'm2' }], nextCursor: 'c1', hasMore: true } },
+		{ statusCode: 200, body: { data: [{ id: 'm3' }, { id: 'm4' }], nextCursor: 'c2', hasMore: true } },
+	]);
+	const [out] = await new Bulkit().execute.call(ctx);
+	assert.deepEqual(out.map((o) => o.json.id), ['m1', 'm2', 'm3']);
+	assert.equal(ctx.calls.length, 2);
+	assert.equal(ctx.calls[0].url, 'https://api.example.com/public/v1/media');
+	assert.deepEqual(ctx.calls[0].qs, { limit: 3 });
+	assert.deepEqual(ctx.calls[1].qs, { limit: 3, cursor: 'c1' });
+});
+
+test('media:getAll with returnAll walks every page', async () => {
+	const ctx = makeContext({ resource: 'media', operation: 'getAll', returnAll: true }, [
+		{ statusCode: 200, body: { data: [{ id: 'm1' }], nextCursor: 'c1', hasMore: true } },
+		{ statusCode: 200, body: { data: [{ id: 'm2' }], nextCursor: null, hasMore: false } },
+	]);
+	const [out] = await new Bulkit().execute.call(ctx);
+	assert.deepEqual(out.map((o) => o.json.id), ['m1', 'm2']);
+	assert.equal(ctx.calls.length, 2);
+	assert.deepEqual(ctx.calls[0].qs, { limit: 100 });
+	assert.deepEqual(ctx.calls[1].qs, { limit: 100, cursor: 'c1' });
+});
+
+test('media:getAll still reads the older bare-array response', async () => {
+	const ctx = makeContext({ resource: 'media', operation: 'getAll', returnAll: false, limit: 2 }, [
+		{ statusCode: 200, body: [{ id: 'm1' }, { id: 'm2' }, { id: 'm3' }] },
+	]);
+	const [out] = await new Bulkit().execute.call(ctx);
+	assert.deepEqual(out.map((o) => o.json.id), ['m1', 'm2']);
+	assert.equal(ctx.calls.length, 1);
+});
+
+test('getAll stops on hasMore: false even when a cursor comes back', async () => {
+	const ctx = makeContext({ resource: 'media', operation: 'getAll', returnAll: true }, [
+		{ statusCode: 200, body: { data: [{ id: 'm1' }], nextCursor: 'stale', hasMore: false } },
+	]);
+	const [out] = await new Bulkit().execute.call(ctx);
+	assert.deepEqual(out.map((o) => o.json.id), ['m1']);
+	assert.equal(ctx.calls.length, 1);
+});
+
+test('getAll stops when the API repeats a cursor', async () => {
+	const ctx = makeContext({ resource: 'media', operation: 'getAll', returnAll: true }, [
+		{ statusCode: 200, body: { data: [{ id: 'm1' }], nextCursor: 'c1', hasMore: true } },
+		{ statusCode: 200, body: { data: [{ id: 'm2' }], nextCursor: 'c1', hasMore: true } },
+		{ statusCode: 200, body: { data: [{ id: 'm3' }], nextCursor: null, hasMore: false } },
+	]);
+	const [out] = await new Bulkit().execute.call(ctx);
+	assert.deepEqual(out.map((o) => o.json.id), ['m1', 'm2']);
+	assert.equal(ctx.calls.length, 2);
+});
+
+test('getAll keeps going past an empty page', async () => {
+	const ctx = makeContext(
+		{ resource: 'comment', operation: 'getAll', postId: 'pst_1', channelId: 'chn_x', returnAll: true },
+		[
+			{ statusCode: 200, body: { data: [], nextCursor: 'c1', hasMore: true } },
+			{ statusCode: 200, body: { data: [{ id: 'k1' }], nextCursor: null, hasMore: false } },
+		],
+	);
+	const [out] = await new Bulkit().execute.call(ctx);
+	assert.deepEqual(out.map((o) => o.json.id), ['k1']);
+	assert.equal(ctx.calls.length, 2);
+	assert.deepEqual(ctx.calls[1].qs, { channelId: 'chn_x', cursor: 'c1' });
+});
+
+test('getAll rejects a Limit that is not a positive whole number', async () => {
+	for (const limit of [undefined, Number.NaN, 0, 2.5, 'abc']) {
+		const ctx = makeContext({ resource: 'media', operation: 'getAll', returnAll: false, limit });
+		await assert.rejects(new Bulkit().execute.call(ctx), /Limit must be a whole number/);
+		assert.equal(ctx.calls.length, 0);
+	}
+});
+
+test('comment:getAll pages without sending a page size', async () => {
+	const ctx = makeContext(
+		{ resource: 'comment', operation: 'getAll', postId: 'pst_1', channelId: 'chn_x', returnAll: false, limit: 1 },
+		[{ statusCode: 200, body: { data: [{ id: 'k1' }, { id: 'k2' }], nextCursor: 'c1', hasMore: true } }],
+	);
+	const [out] = await new Bulkit().execute.call(ctx);
+	assert.deepEqual(out.map((o) => o.json.id), ['k1']);
+	assert.deepEqual(ctx.calls[0].qs, { channelId: 'chn_x' });
+	assert.equal(ctx.calls[0].url, 'https://api.example.com/public/v1/posts/pst_1/comments');
+});
+
 test('media:upload sends multipart bytes', async () => {
 	const ctx = makeContext(
 		{ resource: 'media', operation: 'upload', binaryPropertyName: 'data' },

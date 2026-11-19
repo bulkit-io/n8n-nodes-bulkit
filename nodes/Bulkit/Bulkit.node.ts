@@ -21,9 +21,9 @@ import {
 import { postFields, postOperations } from './descriptions/PostDescription';
 import {
 	bulkitApiRequest,
-	bulkitApiRequestAllItems,
 	buildMultipartBody,
 	getChannelOptions,
+	getManyFromParameters,
 	getTagOptions,
 	parseJson,
 	toIdList,
@@ -241,17 +241,15 @@ async function executePost(
 	}
 
 	if (operation === 'getAll') {
-		const returnAll = this.getNodeParameter('returnAll', i) as boolean;
-		const limit = returnAll ? undefined : (this.getNodeParameter('limit', i) as number);
 		const filters = this.getNodeParameter('filters', i, {}) as IDataObject;
-		const qs: IDataObject = { limit: Math.min(limit ?? 100, 100) };
+		const qs: IDataObject = {};
 		const timeZone = this.getTimezone();
 		if (filters.from) qs.from = toInstant(this.getNode(), filters.from, timeZone, i);
 		if (filters.to) qs.to = toInstant(this.getNode(), filters.to, timeZone, i);
 		if ((filters.status as string[] | undefined)?.length) qs.status = filters.status;
 		const tags = toIdList(filters.tag);
 		if (tags.length) qs.tag = tags;
-		return await bulkitApiRequestAllItems.call(this, '/posts', qs, limit, i);
+		return await getManyFromParameters.call(this, '/posts', qs, i);
 	}
 
 	const postId = encodeURIComponent((this.getNodeParameter('postId', i) as string).trim());
@@ -325,11 +323,7 @@ async function executeMedia(
 		);
 	}
 	if (operation === 'getAll') {
-		return await limitList.call(
-			this,
-			(await bulkitApiRequest.call(this, 'GET', '/media', undefined, {}, {}, i)) as IDataObject[],
-			i,
-		);
+		return await getManyFromParameters.call(this, '/media', {}, i);
 	}
 	if (operation === 'delete') {
 		const mediaId = (this.getNodeParameter('mediaId', i) as string).trim();
@@ -358,15 +352,10 @@ async function executeComment(
 	const channelId = this.getNodeParameter('channelId', i) as string;
 
 	if (operation === 'getAll') {
-		const returnAll = this.getNodeParameter('returnAll', i) as boolean;
-		const limit = returnAll ? undefined : (this.getNodeParameter('limit', i) as number);
-		return await bulkitApiRequestAllItems.call(
-			this,
-			`/posts/${postId}/comments`,
-			{ channelId },
-			limit,
-			i,
-		);
+		// Comments are read live from each platform, so the page size is left to Bulkit.
+		return await getManyFromParameters.call(this, `/posts/${postId}/comments`, { channelId }, i, {
+			sendPageSize: false,
+		});
 	}
 	if (operation === 'reply') {
 		const commentId = encodeURIComponent((this.getNodeParameter('commentId', i) as string).trim());
