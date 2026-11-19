@@ -157,6 +157,29 @@ test('post:getAll follows the cursor and stops at the limit', async () => {
 	assert.deepEqual(ctx.calls[1].qs, { limit: 3, status: ['failed'], cursor: 'c1' });
 });
 
+test('media:getAll follows the cursor and stops at the limit', async () => {
+	const ctx = makeContext({ resource: 'media', operation: 'getAll', returnAll: false, limit: 3 }, [
+		{ statusCode: 200, body: { data: [{ id: 'm1' }, { id: 'm2' }], nextCursor: 'c1', hasMore: true } },
+		{ statusCode: 200, body: { data: [{ id: 'm3' }, { id: 'm4' }], nextCursor: 'c2', hasMore: true } },
+	]);
+	const [out] = await new Bulkit().execute.call(ctx);
+	assert.deepEqual(out.map((o) => o.json.id), ['m1', 'm2', 'm3']);
+	assert.equal(ctx.calls.length, 2);
+	assert.equal(ctx.calls[0].url, 'https://api.example.com/public/v1/media');
+	assert.deepEqual(ctx.calls[0].qs, { limit: 3 });
+	assert.deepEqual(ctx.calls[1].qs, { limit: 3, cursor: 'c1' });
+});
+
+test('media:getAll with returnAll walks every page', async () => {
+	const ctx = makeContext({ resource: 'media', operation: 'getAll', returnAll: true }, [
+		{ statusCode: 200, body: { data: [{ id: 'm1' }], nextCursor: 'c1', hasMore: true } },
+		{ statusCode: 200, body: { data: [{ id: 'm2' }], nextCursor: null, hasMore: false } },
+	]);
+	const [out] = await new Bulkit().execute.call(ctx);
+	assert.deepEqual(out.map((o) => o.json.id), ['m1', 'm2']);
+	assert.deepEqual(ctx.calls[0].qs, { limit: 100 });
+});
+
 test('media:upload sends multipart bytes', async () => {
 	const ctx = makeContext(
 		{ resource: 'media', operation: 'upload', binaryPropertyName: 'data' },

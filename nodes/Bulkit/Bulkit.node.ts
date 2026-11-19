@@ -325,11 +325,10 @@ async function executeMedia(
 		);
 	}
 	if (operation === 'getAll') {
-		return await limitList.call(
-			this,
-			(await bulkitApiRequest.call(this, 'GET', '/media', undefined, {}, {}, i)) as IDataObject[],
-			i,
-		);
+		const returnAll = this.getNodeParameter('returnAll', i) as boolean;
+		const limit = returnAll ? undefined : (this.getNodeParameter('limit', i) as number);
+		const qs: IDataObject = { limit: Math.min(limit ?? 100, 100) };
+		return await bulkitApiRequestAllItems.call(this, '/media', qs, limit, i);
 	}
 	if (operation === 'delete') {
 		const mediaId = (this.getNodeParameter('mediaId', i) as string).trim();
